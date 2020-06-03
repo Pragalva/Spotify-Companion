@@ -1,5 +1,5 @@
 #Pragalva Dhungana 6/3/2020
-#This program was made by following tutorial on spotipy by Ian Annase
+#This program was made by following a tutorial on spotipy by Ian Annase
 #This code is a modification and extention of his code
 import os
 import sys
@@ -92,21 +92,26 @@ while True:
             global trackURIs
             global trackArt
 
+            #local variables
+            printedAlbums =[]
+
             for item in lookupResult:
-                print("ALBUM: " + item['name'])
-                albumID = item['id']
-                albumArt = item ['images'][0]['url']
+                if item['name'] not in printedAlbums:
+                    print("ALBUM: " + item['name'])
+                    printedAlbums.append(item['name'])
+                    albumID = item['id']
+                    albumArt = item ['images'][0]['url']
 
-                #extract track data
-                trackResults = spotifyObject.album_tracks(albumID)
-                trackResults = trackResults['items']
+                    #extract track data
+                    trackResults = spotifyObject.album_tracks(albumID)
+                    trackResults = trackResults['items']
 
-                for item in trackResults:
-                    print(str(index)+ ": " + item['name'])
-                    trackURIs.append(item['uri'])
-                    trackArt.append(albumArt)
-                    index+=1
-                print()
+                    for item in trackResults:
+                        print(str(index)+ ": " + item['name'])
+                        trackURIs.append(item['uri'])
+                        trackArt.append(albumArt)
+                        index+=1
+                    print()
 
 
         #Album details
