@@ -12,7 +12,7 @@ from json.decoder import JSONDecodeError
 
 #Get username
 username = sys.argv[1]
-scope = 'user-read-private user-read-playback-state user-modify-playback-state playlist-modify-public playlist-modify-private'
+scope = 'user-read-private user-read-playback-state user-modify-playback-state playlist-modify-public playlist-modify-private user-top-read'
 
 # Erase cache and prompt for permission
 try:
@@ -53,7 +53,7 @@ def makeplaylist(userID,trackURI):
         songSelection = input("Enter a song number to add to the playlist (a for all songs and x to exit): ")
         if songSelection == "x":
             break
-        if songSelection =="a":
+        elif songSelection =="a":
             tracklen = len(trackURI)
             if (tracklen < 100):
                 spotifyObject.user_playlist_add_tracks(userID,createdPlaylist_id,trackURI)
@@ -71,9 +71,10 @@ def makeplaylist(userID,trackURI):
                 print()
                 print("A playlist with all the songs has been created")
                 break
-        trackSelectionList = []
-        trackSelectionList.append(trackURI[int(songSelection)])
-        spotifyObject.user_playlist_add_tracks(userID,createdPlaylist_id,trackSelectionList)
+        else:
+            trackSelectionList = []
+            trackSelectionList.append(trackURI[int(songSelection)])
+            spotifyObject.user_playlist_add_tracks(userID,createdPlaylist_id,trackSelectionList)
 
 #Main Loop
 while True:
@@ -217,8 +218,8 @@ while True:
         print("How you like to edit this playlist ?")
         print("0 - Upload Playlist Picture")
         print("1 - Edit Name")
-        print("2 - Add tracks")
-        print("3 - Remove tracks")
+        #print("2 - Add tracks")
+        #print("3 - Remove tracks")
         print("9 - Exit")
         choice3 = input("Your Choice: ")
         print()
@@ -240,9 +241,9 @@ while True:
         print()
         print("How would like to generate a recommendation ?")
         print("0 - Generate playlist using Similar Artist")
-        print("1 - Generate playlist using last played songs")
+        #print("1 - Generate playlist using last played songs")
         print("2 - Generate playlist using your top tracks")
-        print("3 - Generate playlist using tracks")
+        print("3 - Generate playlist using tracks top artists")
         print()
         choice4 =input("Your choice: ")
 
@@ -292,6 +293,110 @@ while True:
 
             #Playlist Creation
             makeplaylist(userID,songResultURI)
+        if choice4 == "2":
+            print()
+            print("What time frame would you the top tracks for ?")
+            print("0 - Short term")
+            print("1 - Medium term")
+            print("2 - Long term")
+            timeChoice = input("your choice: ")
+            print()
+            print( "Your top tracks are ")
+            print()
+
+            if timeChoice == "0":
+                toptracks = spotifyObject.current_user_top_tracks(20,0,'short_term')
+            if timeChoice == "1":
+                toptracks = spotifyObject.current_user_top_tracks(20,0,'medium_term')
+            if timeChoice == "2":
+                toptracks = spotifyObject.current_user_top_tracks(20,0,'long_term')
+            toptracks = toptracks['items']
+
+            #variables used in the loop below
+            toptracksNames =[]
+            toptracksURIs =[]
+            toptrackindex = 0
+
+            #Loop to print top tracks
+            for items in toptracks:
+                toptracksNames.append(toptracks[toptrackindex]['name'])
+                print(toptracks[toptrackindex]['name'])
+                toptracksURIs.append(toptracks[toptrackindex]['uri'])
+                toptrackindex += 1
+
+            #Loop VARIABLE
+            recommendedSongsURI = []
+            lstart = 0
+            lend = 5
+            printIndex = 0
+            print()
+            print("Here are the recommneded songs ")
+
+            for x in range(4):
+                recommendSongs = spotifyObject.recommendations(seed_artists = toptracksURIs[lstart:lend])
+                recommendSongs = recommendSongs['tracks']
+                recomindex =0
+                for x in recommendSongs:
+                    if (recommendSongs[recomindex]['uri'] not in recommendedSongsURI): # To weed out dublicate
+                        print (str(printIndex)+ ' ' + recommendSongs[recomindex]['name']) # Print name
+                        recommendedSongsURI.append(recommendSongs[recomindex]['uri']) # Add URI
+                        recomindex+=1
+                        printIndex+=1
+                lstart+=5
+                lend+=5
+            makeplaylist(userID,recommendedSongsURIsongURIs)
+
+        if choice4 =="3":
+            print()
+            print("What time frame would you the top artists for ?")
+            print("0 - Short term")
+            print("1 - Medium term")
+            print("2 - Long term")
+            timeChoice = input("your choice: ")
+            print()
+            print( "Your top artists are ")
+            print()
+
+            if timeChoice == "0":
+                topArtists = spotifyObject.current_user_top_artists(20,0,'short_term')
+            if timeChoice == "1":
+                topArtists = spotifyObject.current_user_top_artists(20,0,'medium_term')
+            if timeChoice == "2":
+                topArtists = spotifyObject.current_user_top_artists(20,0,'long_term')
+            topArtists = topArtists['items']
+
+            #variables used in the loop below
+            topArtistsNames =[]
+            topArtistsURIs =[]
+            topIndex = 0
+
+            for items in topArtists:
+                topArtistsNames.append(topArtists[topIndex]['name'])
+                print(topArtists[topIndex]['name'])
+                topArtistsURIs.append(topArtists[topIndex]['uri'])
+                topIndex += 1
+
+            #Loop VARIABLE
+            recomURI = []
+            lstart = 0
+            lend = 5
+            printIndex = 0
+            print()
+            print("Here are the recommneded songs ")
+
+            for x in range(4):
+                recomSongs = spotifyObject.recommendations(seed_artists = topArtistsURIs[lstart:lend])
+                recomSongs = recomSongs['tracks']
+                recomindex =0
+                for x in recomSongs:
+                    if (recomSongs[recomindex]['uri'] not in recomURI): # To weed out dublicate
+                        print (str(printIndex)+ ' ' + recomSongs[recomindex]['name']) # Print name
+                        recomURI.append(recomSongs[recomindex]['uri']) # Add URI
+                        recomindex+=1
+                        printIndex+=1
+                lstart+=5
+                lend+=5
+            makeplaylist(userID,recomURI)
 
 
     #Exit
