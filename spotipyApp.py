@@ -340,8 +340,8 @@ while True:
                     if (recommendSongs[recomindex]['uri'] not in recommendedSongsURI): # To weed out dublicate
                         print (str(printIndex)+ ' ' + recommendSongs[recomindex]['name']) # Print name
                         recommendedSongsURI.append(recommendSongs[recomindex]['uri']) # Add URI
-                        recomindex+=1
                         printIndex+=1
+                    recomindex+=1
                 lstart+=5
                 lend+=5
             makeplaylist(userID,recommendedSongsURIsongURIs)
@@ -392,8 +392,8 @@ while True:
                     if (recomSongs[recomindex]['uri'] not in recomURI): # To weed out dublicate
                         print (str(printIndex)+ ' ' + recomSongs[recomindex]['name']) # Print name
                         recomURI.append(recomSongs[recomindex]['uri']) # Add URI
-                        recomindex+=1
                         printIndex+=1
+                    recomindex+=1
                 lstart+=5
                 lend+=5
             makeplaylist(userID,recomURI)
