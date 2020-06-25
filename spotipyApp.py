@@ -333,7 +333,7 @@ while True:
             print("Here are the recommneded songs ")
 
             for x in range(4):
-                recommendSongs = spotifyObject.recommendations(seed_artists = toptracksURIs[lstart:lend])
+                recommendSongs = spotifyObject.recommendations(seed_tracks = toptracksURIs[lstart:lend])
                 recommendSongs = recommendSongs['tracks']
                 recomindex =0
                 for x in recommendSongs:
